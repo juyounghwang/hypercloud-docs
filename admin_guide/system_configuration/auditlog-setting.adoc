@@ -3,10 +3,28 @@
 :toc-title:
 
 == 감사 로그 설정
-감사 로그 설정을 통해 콘솔에서 행해지는 사용자의 특정 리소스에 대한 액세스 시도를 관리할 수 있다.
+컨트롤 플레인에 접근할 수 있는 환경에서 감사 로그 설정을 통해 콘솔에서 행해지는 사용자의 특정 리소스에 대한 액세스 시도를 관리할 수 있다.
+
+. *감사 로그 메뉴 추가* +
+ArgoCD console 모듈의 config.notUseAuditlog 파라미터를 false 설정하여 HyperCloud 콘솔에 감사 로그 메뉴를 추가할 수 있다.
++
+----
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: console
+  name: auditlog
+  namespace: api-gateway-system
+data:
+  runtime-config.js: |
+    window.__RUNTIME_CONFIG__ = {
+        isNotExistAuditLog: false
+    }
+----
 
 . *감사 로그 정책 지정* +
-`/etc/kubernetes/pki/audit-policy.yaml` 파일에 항목을 추가/제거하여 어떤 이벤트를 로그에 기록하고 제외할지 설정한다.
+`/etc/kubernetes/pki/audit-policy.yaml` 파일에 항목을 추가/제거하여 어떤 이벤트를 로그에 기록하고 제외할지 설정한다. 아래는 설정 예시이다.
 +
 ----
 apiVersion: audit.k8s.io/v1 # This is required.
@@ -186,7 +204,7 @@ $ openssl x509 -req -in tls.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out tl
 ----
 $ kubectl create secret tls tls-secret --cert=tls.crt --key=tls.key -n hypercloud5-system
 
-$ k edit deploy -n hypercloud5-system hypercloud5-api-server
+$ kubectl edit deploy -n hypercloud5-system hypercloud5-api-server
           volumeMounts:
             - mountPath: /var/run/secrets/tls	
               name: tls-secret	
@@ -202,7 +220,7 @@ $ k edit deploy -n hypercloud5-system hypercloud5-api-server
 Ingress에 TLS 설정을 추가한다. 
 +
 ----
-$ k edit ingress -n hypercloud5-system hc-api-server-ingress
+$ kubectl edit ingress -n hypercloud5-system hc-api-server-ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -275,7 +293,7 @@ secrets:
 d. *token 값 확인* 
 +
 ----
-$ k get secret -n hyperauth test-token -o jsonpath='{.data.token}' | base64 -d
+$ kubectl get secret -n hyperauth test-token -o jsonpath='{.data.token}' | base64 -d
 ----
 e. *HyperAuth user에 token 등록* +
 HyperAuth 특정 유저의 Attributes에 token 값을 추가한다.
