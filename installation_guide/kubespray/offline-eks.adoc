@@ -1,18 +1,16 @@
-= AWS 환경에서 구축
+= EKS 환경에서 구축
 
-본 장에서는 AWS 환경에서 폐쇄망으로 Kubespray를 이용하여 HyperCloud를 설치하는 방법에 대해서 설명한다.
+본 장에서는 EKS 환경에서 폐쇄망으로 Kubespray를 이용하여 HyperCloud를 설치하는 방법에 대해서 설명한다.
 
 설치하는 과정은 크게 다음과 같다.
 
-. <<TerraformAws, Terraform 구성>>
-. <<K8sInfraAws, 쿠버네티스 인프라 구성>>
+. <<EKSBastion, EKS 구성>>
 . <<ArgoCDInstallAws, ArgoCD 설치>>
 . <<MasterClusterAws, 마스터 클러스터 설치>>
-. <<SingleClusterAws, 싱글 클러스터 설치>>
 . <<ResourceDeployAws, 리소스 배포>>
 
-[#TerraformAws]
-== Terraform 구성
+[#EKSBastion]
+== EKS 구성
 
 Terraform을 이용하여 CSP(AWS, vSphere) 환경에서의 쿠버네티스 클러스터 구성을 위한 인프라 리소스를 생성할 수 있다.
 
