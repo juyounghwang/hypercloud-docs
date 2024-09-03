@@ -15,15 +15,15 @@
 
 1번부터 4번까지의 과정은 eksctl을 사용하거나, AWS Management Console을 사용하는 두 가지 방법으로 수행할 수 있다.
 
-- eksctl 사용 방법:
+* eksctl 사용 방법:
 +
-'eksctl'은 명령줄 도구로, Bastion 서버에 사전 설치가 필요합니다. 이 방법은 AWS Management Console에 비해 빠르고 간단하게 EKS 클러스터를 설정할 수 있는 장점이 있다. 특히, 자동화된 배포 및 설정을 간편하게 처리하고자 할 때 유리합니다.
+'eksctl'은 명령줄 도구로, Bastion 서버에 사전 설치가 필요하다. 이 방법은 AWS Management Console에 비해 빠르고 간단하게 EKS 클러스터를 설정할 수 있는 장점이 있다. 특히, 자동화된 배포 및 설정을 간편하게 처리하고자 할 때 유리하다.
 
-- AWS Management Console 사용 방법:
+* AWS Management Console 사용 방법:
 +
 AWS Management Console은 GUI 기반의 설정 환경을 제공하여, 'eksctl'에 비해 보다 세부적인 설정 및 구성이 가능하다. GUI를 통해 사용자는 직접 옵션을 선택하고 구성할 수 있으므로, 세밀한 제어와 맞춤형 설정이 필요한 경우 적합하다.
 
-각 방법의 장점과 단점이 있으므로, 환경에 따라 적절한 방법을 선택하는 것이 좋다. 자세한 내용은 [AWS 공식 문서](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/getting-started.html) 를 참고하여 각 방법에 대한 최신 정보와 지침을 확인한다.
+각 방법의 장점과 단점이 있으므로, 환경에 따라 적절한 방법을 선택하는 것이 좋다. 자세한 내용은 link:https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/getting-started.html[AWS 공식 사용자 가이드]를 참고하여 각 방법에 대한 최신 정보와 지침을 확인한다.
 
 [#EKSVPCBastion]
 == VPC 및 Bastion 서버 생성
@@ -38,15 +38,60 @@ AWS Management Console은 GUI 기반의 설정 환경을 제공하여, 'eksctl'�
 * AWS Secret Access Key
 ====
 
-[#VPCSetting]
+[#VPCCreating]
 === VPC 생성
 
-. *저장소 추가*
+VPC는 AWS Management Console을 통해 생성하거나, AWS CloudFormation 템플릿을 사용하여 자동으로 생성할 수 있다.
+
+본 가이드에서는 AWS Management Console을 사용하여 VPC를 생성하는 방법을 다룬다.
+
+[VPC 서비스 > VPC > VPC 생성] 화면에서 '생성할 리소스'로 'VPC 등'을 선택하고, '이름'을 입력하고, 환경에 맞게 다른 값들을 설정한다.
+
+image::../../images/eks_create_vpc.png[]
+
+[#BastionCreating]
+=== Bastion 서버 생성 및 설정
+
+AWS CLI, kubectl, eksctl 명령을 실행할 Bastion 서버를 생성한다.
+
+. *Bastion 서버 생성*
 +
-패키지 설치에 사용할 저장소를 추가한다.
+.. 키 페어 생성
+.. 보안 그룹 생성
+.. 인스턴스 생성
+
+. *AWS CLI 설치*
++
+AWS CLI 설치 파일을 다운로드 받고, 압축 해제한 후 설치 프로그램을 실행한다.
++
+----
+$ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+$ unzip awscliv2.zip
+$ sudo ./aws/install
+----
++
+다음 명령으로 설치를 확인한다.
++
+----
+$ aws --version
+----
++
+AWS 보안 인증을 입력한다.
++
+----
+$ aws configure
+AWS Access Key ID [None]:   // 사전에 준비한 AWS Access Key ID를 입력
+AWS Secret Access Key [None]:   // 사전에 준비한 AWS Secret Access Key를 입력
+Default region name [None]:   // ex)ap-northeast-3
+Default output format [None]: json
+----
+
+. *kubectl 설치*
 +
 
 
+. *eksctl 설치*
++
 
 
 [#EKSCluster]
