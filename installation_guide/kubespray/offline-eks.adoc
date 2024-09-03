@@ -1,21 +1,60 @@
 = EKS 환경에서 구축
 
-본 장에서는 EKS 환경에서 폐쇄망으로 Kubespray를 이용하여 HyperCloud를 설치하는 방법에 대해서 설명한다.
+본 장에서는 Amazon EKS 환경에서 폐쇄망으로 Kubespray를 이용하여 HyperCloud를 설치하는 방법에 대해서 설명한다.
 
 설치하는 과정은 크게 다음과 같다.
 
-. <<EKSBastion, EKS 구성>>
-. <<EKSSetting, 노드 환경 설정>>
+. <<EKSVPCBastion, VPC 및 Bastion 서버 생성>>
+. <<EKSCluster, EKS 클러스터 생성 및 설정>>
+. <<EKSNode, 노드 생성>>
+. <<EFSSetting, EFS-CSI 드라이버 설치>>
+. <<BastionSetting, Bastion 서버 설정>>
 . <<ArgoCDInstallEks, ArgoCD 설치>>
 . <<MasterClusterEks, 마스터 클러스터 설치>>
 . <<ResourceDeployEks, 리소스 배포>>
 
-[#EKSBastion]
-== EKS 구성 -> 이 부분 주영님 작성 필요(테라폼은 기존 형식 참고용입니다)
+1번부터 4번까지의 과정은 eksctl을 사용하거나, AWS Management Console을 사용하는 두 가지 방법으로 수행할 수 있다.
 
-본 절에서는 eks를 이용한 클러스터 구성 및 EKS 클러스터를 사용하기 위한 Bastion을  설치하는 방법에 대해서 설명한다.
+- eksctl 사용 방법:
++
+'eksctl'은 명령줄 도구로, Bastion 서버에 사전 설치가 필요합니다. 이 방법은 AWS Management Console에 비해 빠르고 간단하게 EKS 클러스터를 설정할 수 있는 장점이 있다. 특히, 자동화된 배포 및 설정을 간편하게 처리하고자 할 때 유리합니다.
 
-.eks을 설치하기 위해서는 다음과 같은 사전 준비가 필요하다.
+- AWS Management Console 사용 방법:
++
+AWS Management Console은 GUI 기반의 설정 환경을 제공하여, 'eksctl'에 비해 보다 세부적인 설정 및 구성이 가능하다. GUI를 통해 사용자는 직접 옵션을 선택하고 구성할 수 있으므로, 세밀한 제어와 맞춤형 설정이 필요한 경우 적합하다.
+
+각 방법의 장점과 단점이 있으므로, 환경에 따라 적절한 방법을 선택하는 것이 좋다. 자세한 내용은 [AWS 공식 문서](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/getting-started.html) 를 참고하여 각 방법에 대한 최신 정보와 지침을 확인한다.
+
+[#EKSVPCBastion]
+== VPC 및 Bastion 서버 생성
+
+본 절에서는 EKS 클러스터를 생성 및 사용하기 위한 VPC와 Bastion 서버를 생성하는 방법에 대해서 설명한다.
+
+.EKS를 생성 및 사용하기 위해서는 다음과 같은 사전 준비가 필요하다.
+[NOTE]
+====
+* IAM 계정 발급
+* AWS Access Key ID
+* AWS Secret Access Key
+====
+
+[#VPCSetting]
+=== VPC 생성
+
+. *저장소 추가*
++
+패키지 설치에 사용할 저장소를 추가한다.
++
+
+
+
+
+[#EKSCluster]
+== EKS 클러스터 생성 및 설정
+
+본 절에서는 EKS 클러스터를 생성하는 방법에 대해서 설명한다.
+
+.EKS 클러스터를 생성하기 위해서는 다음과 같은 사전 준비가 필요하다.
 [NOTE]
 ====
 * IAM 계정 발급
@@ -30,16 +69,32 @@ eks 클러스터를 구성하는 순서는 다음과 같다.
 [#TerraformInstallAws]
 === Terraform 설치
 
-외부망 환경에서 Terraform을 사용하기 위해 관련 패키지를 설치한다.
-
-. *저장소 추가*
-+
-패키지 설치에 사용할 저장소를 추가한다.
-+
 
 
-[#EKSSetting]
-== 노드 환경 설정
+[#EKSNode]
+== 노드 생성
+
+[#EFSSetting]
+== EFS-CSI 드라이버 설치
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[#BastionSetting]
+== Bastion 서버 설정
 
 본 절에서는 kubespray 수행을 위한 bastion 서버 환경 설정하는 방법에 대해서 설명한다.
 
@@ -48,7 +103,7 @@ eks 클러스터를 구성하는 순서는 다음과 같다.
 . <<PackageSetting, 패키지 설정>>
 . <<WebServerSetting, 웹 서버 레포지터리 설정>>
 . <<ImageRegistrySetting, 로컬 이미지 레지스트리 설정>>
-. <<KubesprayRunArgoAks, Kubespray 실행>>
+. <<KubesprayRunArgoEks, Kubespray 실행>>
 
 [#PackageSetting]
 === 패키지 설정
@@ -272,7 +327,7 @@ ArgoCD를 설치하는 순서는 다음과 같다.
 
 . <<KubesprayDecompressionArgoAks, Kubespray 파일 압축 해제>>
 . <<KubesprayConfigArgoAks, Kubespray 환경 설정>>
-. <<KubesprayRunArgoAks, Kubespray 실행>>
+. <<KubesprayRunArgoEks, Kubespray 실행>>
 
 [#KubesprayDecompressionArgoAks]
 === Kubespray 파일 압축 해제
