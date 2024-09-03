@@ -3,16 +3,14 @@
 :toc-title:
 
 == 설치 구성
-
-* *AKS 환경*
-. AKS 클러스터 구성
-. kubespray-aks를 수행을 통한 nginx-ingress, argocd 설치
+. AKS 또는 EKS 클러스터 구성
+. kubespray-5.3 실행을 통한 nginx-ingress, argocd 설치
 . ArgoCD를 통해 애플리케이션을 배포
-
 
 == 시스템 요구사항
 HyperCloud 설치를 위한 시스템 요구사항은 다음과 같다.
 
+*AKS 환경*
 [width="100%",options="header", cols="1,3"]
 |====================
 |구분|요구사항
@@ -22,7 +20,7 @@ HyperCloud 설치를 위한 시스템 요구사항은 다음과 같다.
 
 |노드 풀|운영체제 : Ubuntu Linux 
 
-이미지 버전 : AKSUbuntu-2204gen2containerd-202403.19.0 이상 
+이미지 버전 : 'AKSUbuntu-2204gen2containerd-202403.19.0' 이상 
 
 vCPU(최소 : 18 core, 권장 : 50 core)
 
@@ -33,6 +31,29 @@ vCPU(최소 : 18 core, 권장 : 50 core)
 네트워크 정책 : Azure
 
 |====================
+
+*EKS 환경*
+[width="100%",options="header", cols="1,3"]
+|====================
+|구분|요구사항
+|EKS 구성|Kubernetes 버전 : 1.28
+
+인증 및 권한 부여 : Kuberentes RBAC을 사용하는 IAM 역할 기반 인증
+
+|노드 그룹|운영체제 : Amazon Linux 2
+
+이미지 버전 : 'ami-eks-node-1.28.11-20240807' 이상 
+
+vCPU(최소 : 18 core, 권장 : 50 core)
+
+메모리(최소 : 41 GiB, 권장 : 74 GiB)
+
+|네트워크|네트워크 유형 : VPC CNI
+
+네트워크 정책 : AWS Security Groups for Pods
+
+|====================
+
 [NOTE]
 ==== 
 Hypercloud의 최소사양은 모듈 설치에 필요한 리소스 기준이며 고객사 환경에 따라 조정해야한다. +
@@ -52,6 +73,6 @@ https://technet.tmaxsoft.com/
 [width="100%",options="header", cols="1,3"]
 |====================
 |파일|설명
-|kubespray-aks.zip|AWS 환경에서 ArgoCD 설치를 위한 파일
+|kubespray-5.3.zip|AWS 환경에서 ArgoCD 설치를 위한 파일
 |argocd-installer-5.3.zip|ArgoCD를 통한 Hypercloud 모듈 설치 파일
 |====================
