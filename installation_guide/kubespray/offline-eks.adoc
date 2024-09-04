@@ -114,8 +114,8 @@ Default output format [None]: json
 
 [#PackageSetting]
 === 패키지 설정
-bastion 노드에 git, httpd, kubectl, pip3, ansible, rsync 패키지를 설치한다.
-각 워커 노드에 kubectl 및 .kube/config 파일을 옮긴다.
+bastion 노드에 git, httpd, kubectl, pip3, ansible, rsync 패키지를 설치한다. +
+bastion 노드 root, ec2-user 계정에 kubectl 및 .kube/config 파일을 옮긴다.
 
 [#WebServerSetting]
 === 웹 서버 리포지터리 구성
@@ -241,16 +241,16 @@ $ yum install docker
 .daemon.json 파일
 ----
 {
-    "insecure-registries": ["{INTERNAL_IP:PORT}"]
+    "insecure-registries": ["{IMAGE_REGISTRY_IP:PORT}"]
 }
 ----
 +
-registries.conf 파일의 인자 값에 대한 설명은 다음과 같다.
+daemon.json 파일의 인자 값에 대한 설명은 다음과 같다.
 +
 [width="100%",options="header", cols="1,3"]
 |====================
 |인자 값|설명
-|{INTERNAL_IP:PORT}|이미지 레지스트리를 구성할 서버의 IP 주소와 Registry 이미지의 포트 번호 (예: 10.0.10.50:5000)
+|{IMAGE_REGISTRY_IP:PORT}|이미지 레지스트리를 구성할 서버의 IP 주소와 Registry 이미지의 포트 번호 (예: 10.0.10.50:5000)
 |====================
 
 . *hypercloud5.3 이미지 다운로드*
@@ -305,9 +305,11 @@ $ curl {IMAGE_REGISTRY_IP}:5000/v2/_catalog
 |{IMAGE_REGISTRY_IP}|이미지 레지스트리를 구성한 서버의 IP 주소 (예: 10.0.10.50)
 |====================
 
++
 . *워커 노드 cri에 local private registry insecure 설정*
 +
 eks 1.28 기준 containerd 사용하고 있어서 각 워커 노드마다 /etc/containerd/config.toml 에 local private registry insecure 설정을 한다.
++
 ----
 /etc/containerd/config.toml
 
@@ -325,6 +327,40 @@ eks 1.28 기준 containerd 사용하고 있어서 각 워커 노드마다 /etc/c
       endpoint = ["http://{IMAGE_REGISTRY_IP}"]
 ----
 
+. *워커 노드 리소스 생성 권한 추가*
++
+cluster-admin ClusterRole에 각 워커 노드를 사용자로 지정하여 워커 노드에 리소스 생성 권한을 추가한다.
++
+----
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cluster-admin-test
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: cluster-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: system:node:{WORKER1_NODE_IP}
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: system:node:{WORKER2_NODE_IP}
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: system:node:{WORKER3_NODE_IP}
+----
++
+ClusterRoleBinding의 인자 값에 대한 설명은 다음과 같다.
++
+[width="100%",options="header", cols="1,3"]
+|====================
+|인자 값|설명
+|{WORKER_NODE_IP}|eks로 생성한 클러스터의 노드들의 주소 (예: ip-x-x-x-x.ap-northeast-x.compute.internal)
+|====================
+
+
 [#ArgoCDInstallEks]
 == ArgoCD 설치
 
@@ -332,16 +368,16 @@ eks 1.28 기준 containerd 사용하고 있어서 각 워커 노드마다 /etc/c
 
 ArgoCD를 설치하는 순서는 다음과 같다.
 
-. <<KubesprayDecompressionArgoAks, Kubespray 파일 압축 해제>>
-. <<KubesprayConfigArgoAks, Kubespray 환경 설정>>
+. <<KubesprayDecompressionArgoEks, Kubespray 파일 압축 해제>>
+. <<KubesprayConfigArgoEks, Kubespray 환경 설정>>
 . <<KubesprayRunArgoEks, Kubespray 실행>>
 
-[#KubesprayDecompressionArgoAks]
+[#KubesprayDecompressionArgoEks]
 === Kubespray 파일 압축 해제
 
 ArgoCD 설치를 위해 테크넷을 통해서 다운로드한 *kubespray-5.3.zip* 파일을 생성한 bastion 서버에 압축을 해제한다.
 
-[#KubesprayConfigArgoAks]
+[#KubesprayConfigArgoEks]
 === Kubespray 환경 설정
 
 Kubespray를 실행하기 위한 필수 설정 파일들을 정의한다.
@@ -419,21 +455,24 @@ files_repo: "http://172.22.5.2" <3>
 
 . *domain 설정*
 +
-`kubespray-5.3/inventory/tmaxcloud/group_vars/k8s_cluster/k8s-cluster.yml` 파일을 열어 domain을 설정한다.
+`kubespray-5.3/inventory/tmaxcloud/group_vars/k8s_cluster/k8s-cluster.yml` 파일을 열어 사용할 도메인을 입력한다.
 +
 .예시
 ----
 # Enable extra custom DNS domain - by sophal_hong@tmax.co.kr
-enable_local_nip_domain: false
+enable_local_nip_domain: false <1>
 enable_custom_domain: true
-custom_domain_name: "domain.name"
+custom_domain_name: "domain.name" <2>
 custom_domain_ip:
 api_server_dns_cfwhn: true
 ----
++
+<1> nip.io 도메인 사용 여부
+<2> 도메인 명
 
 . *설치할 애플리케이션 구성 정보 확인*
 +
-해당 애플리케이션의 구성 정보는 기본적으로 `kubespray-aws/inventory/tmaxcloud/group_vars/k8s_cluster/addon.yml` 파일에서 설정이 가능하며, 추가적으로 커스터마이징이 필요할 경우에는 `kubespray-5.3/roles/bootstrap-cloud/task/` 및 `kubespray-5.3/roles/bootstrap-cloud/templates/` 하위 파일에서 설정이 가능하다.
+해당 애플리케이션의 구성 정보는 기본적으로 `kubespray-5.3/inventory/tmaxcloud/group_vars/k8s_cluster/addon.yml` 파일에서 설정이 가능하며, 추가적으로 커스터마이징이 필요할 경우에는 `kubespray-5.3/roles/bootstrap-cloud/task/` 및 `kubespray-5.3/roles/bootstrap-cloud/templates/` 하위 파일에서 설정이 가능하다.
 +
 
 . *설치 모듈 설정*
@@ -583,7 +622,7 @@ ArgoCD 콘솔 로그인 화면이 열리면 계정 아이디와 비밀번호를 
 +
 [NOTE]
 ====
-ArgoCD 계정 아이디 및 초기 비밀번호 정보는 다음의 명령을 실행하여 확인할 수 있다.
+ArgoCD 계정 아이디 및 초기 비밀번호 정보는 admin/admin 이며, 다음의 명령을 실행하여 확인할 수 있다.
 ----
 $ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ----
