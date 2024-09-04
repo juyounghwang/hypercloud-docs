@@ -90,87 +90,6 @@ $ sudo systemctl stop firewalld
 ----
 
 
-
-[#AzureBastion]
-== Bastion 구성
-
-본 절에서는 Kubespray를 AKS 클러스터에서 사용하기 위한 Azure Bastion을 구성하는 방법에 대해서 설명한다. 
-
-Bastion을 구성하는 순서는 다음과 같다.
-
-. <<CreateSshKey, SSH 키 쌍 생성>>
-. <<ConfigNetwork, 네트워크 설정>>
-. <<CreateBastion, Bastion 생성>>
-. <<BastionTunnel, Bastion 터널 연결>>
-
-
-[#CreateSshKey]
-=== SSH 키 쌍 생성
-
-Bastion에서 SSH 키를 이용하여 AKS 클러스터에 접근하기 위해 SSH 키 쌍을 생성한다. 
-
-image::../../images/create_ssh_key_01.png[]
-
-SSH 키 쌍을 다운로드하여 저장하도록 한다. 
-
-image::../../images/create_ssh_key_02.png[]
-
-[#ConfigNetwork]
-=== 네트워크 설정
-
-Bastion에서 SSH를 통해 AKS 클러스터에 접근하기 위해 SSH 포트(TCP/22)에 대한 Inbound 규칙을 추가한다.
-
-image::../../images/confing_network_rule_01.png[]
-
-SSH의 Inbound를 허용하는 규칙을 작성한다. 
-
-image::../../images/confing_network_rule_02.png[]
-
-[#CreateBastion]
-=== Bastion 생성
-
-Bastion을 생성한 AKS 클러스터의 인스턴스를 선택한다. 
-
-image::../../images/create_bastion_01.png[]
-
-AKS 클러스터의 인스턴스로 접근할 Bastion을 생성한다. 
-
-image::../../images/create_bastion_02.png[]
-
-저장한 SSH 키 쌍을 이용하여 Bastion에 연결한다.
-브라우저의 새 탭을 통해 Bastion에 연결되며 SSH를 통해 AKS 클러스터 인스턴스에 접근한 것을 확인할 수 있다.
-
-image::../../images/create_bastion_03.png[]
-
-
-[#BastionTunnel]
-=== Bastion Tunnel 연결
-
-AKS 클러스터 인스턴스에 파일을 업로드하기 위해서는 Bastion Tunnel 연결이 필요하다.
-
-Tunnel 연결을 위해 Bastion의 구성을 변경한다. 
-
-image::../../images/config_bastion.png[]
-
-azure cli를 이용하여 Bastion에 Tunnel을 연결한다.
-
-.Tunnel 연결
-----
-az network bastion tunnel --name {Bastion 이름} --resource-group {리소스 그룹 이름} --target-ip-address {VM 인스턴스의 IP 주소} --resource-port {VM 인스턴스의 포트} --port {로컬 PC의 포트}
-----
-
-.예시
-----
-az network bastion tunnel --name aks-vnet-25935767-bastion --resource-group MC_HCV_group_HCV_koreacentral --target-ip-address 10.224.1.166 --resource-port 22 --port 50022
-----
-
-.파일 업로드 예시
-----
-scp -i aks.pem -P 50022 test.txt azureuser@127.0.0.1:/home/azureuser/.
-----
-
-CAUTION: AKS 또는 VMSS 재기동 시 인스턴스에 저장한 파일과 디렉터리가 초기화되므로 주의한다.
-
 [#BastionSetting]
 == Bastion 서버 설정
 본 절에서는 kubespray 수행을 위한 bastion 서버 환경 설정하는 방법에 대해서 설명한다.
@@ -679,3 +598,85 @@ image::../../images/figure_application_sync_02.png[]
 애플리케이션의 *Status* 항목에 "Healthy"와 "Synced"가 표시되는지 확인한다.
 +
 image::../../images/figure_application_sync_03.png[]
+
+
+
+[#AzureBastion]
+== Bastion 구성
+
+본 절에서는 Kubespray를 AKS 클러스터에서 사용하기 위한 Azure Bastion을 구성하는 방법에 대해서 설명한다. 
+
+Bastion을 구성하는 순서는 다음과 같다.
+
+. <<CreateSshKey, SSH 키 쌍 생성>>
+. <<ConfigNetwork, 네트워크 설정>>
+. <<CreateBastion, Bastion 생성>>
+. <<BastionTunnel, Bastion 터널 연결>>
+
+
+[#CreateSshKey]
+=== SSH 키 쌍 생성
+
+Bastion에서 SSH 키를 이용하여 AKS 클러스터에 접근하기 위해 SSH 키 쌍을 생성한다. 
+
+image::../../images/create_ssh_key_01.png[]
+
+SSH 키 쌍을 다운로드하여 저장하도록 한다. 
+
+image::../../images/create_ssh_key_02.png[]
+
+[#ConfigNetwork]
+=== 네트워크 설정
+
+Bastion에서 SSH를 통해 AKS 클러스터에 접근하기 위해 SSH 포트(TCP/22)에 대한 Inbound 규칙을 추가한다.
+
+image::../../images/confing_network_rule_01.png[]
+
+SSH의 Inbound를 허용하는 규칙을 작성한다. 
+
+image::../../images/confing_network_rule_02.png[]
+
+[#CreateBastion]
+=== Bastion 생성
+
+Bastion을 생성한 AKS 클러스터의 인스턴스를 선택한다. 
+
+image::../../images/create_bastion_01.png[]
+
+AKS 클러스터의 인스턴스로 접근할 Bastion을 생성한다. 
+
+image::../../images/create_bastion_02.png[]
+
+저장한 SSH 키 쌍을 이용하여 Bastion에 연결한다.
+브라우저의 새 탭을 통해 Bastion에 연결되며 SSH를 통해 AKS 클러스터 인스턴스에 접근한 것을 확인할 수 있다.
+
+image::../../images/create_bastion_03.png[]
+
+
+[#BastionTunnel]
+=== Bastion Tunnel 연결
+
+AKS 클러스터 인스턴스에 파일을 업로드하기 위해서는 Bastion Tunnel 연결이 필요하다.
+
+Tunnel 연결을 위해 Bastion의 구성을 변경한다. 
+
+image::../../images/config_bastion.png[]
+
+azure cli를 이용하여 Bastion에 Tunnel을 연결한다.
+
+.Tunnel 연결
+----
+az network bastion tunnel --name {Bastion 이름} --resource-group {리소스 그룹 이름} --target-ip-address {VM 인스턴스의 IP 주소} --resource-port {VM 인스턴스의 포트} --port {로컬 PC의 포트}
+----
+
+.예시
+----
+az network bastion tunnel --name aks-vnet-25935767-bastion --resource-group MC_HCV_group_HCV_koreacentral --target-ip-address 10.224.1.166 --resource-port 22 --port 50022
+----
+
+.파일 업로드 예시
+----
+scp -i aks.pem -P 50022 test.txt azureuser@127.0.0.1:/home/azureuser/.
+----
+
+CAUTION: AKS 또는 VMSS 재기동 시 인스턴스에 저장한 파일과 디렉터리가 초기화되므로 주의한다.
