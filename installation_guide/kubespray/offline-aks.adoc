@@ -5,7 +5,7 @@
 설치하는 과정은 크게 다음과 같다.
 
 . <<AzureVM, 가상 머신 구성>>
-. <<AzureBastion, Bastion 구성성>>
+. <<AzureBastion, Bastion 구성>>
 . <<BastionSetting, Bastion 설정>>
 . <<ArgocdInstallAks, ArgoCD 설치>>
 . <<MasterClusterAks, 마스터 클러스터 설치>>
