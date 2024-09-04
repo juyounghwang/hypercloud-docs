@@ -74,11 +74,11 @@ image::../../images/config_vm_network.png[]
 
 최초 /home에서 사용 가능한 볼륨이 1GiB로 kubespary를 사용하기 위해 /home의 볼륨을 확장한다. 
 
----
+----
 $ lvextend -L +20G /dev/rootvg/homelv
   Size of logical volume rootvg/homelv changed from 1.00 GiB (256 extents) to 21.00 GiB (5376 extents).
   Logical volume rootvg/homelv successfully resized.
----
+----
 
 
 
