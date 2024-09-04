@@ -87,56 +87,19 @@ Default output format [None]: json
 ----
 
 . *kubectl 설치*
-+
-
 
 . *eksctl 설치*
-+
-
 
 [#EKSCluster]
 == EKS 클러스터 생성 및 설정
 
 본 절에서는 EKS 클러스터를 생성하는 방법에 대해서 설명한다.
 
-.EKS 클러스터를 생성하기 위해서는 다음과 같은 사전 준비가 필요하다.
-[NOTE]
-====
-* IAM 계정 발급
-*
-*
-====
-
-eks 클러스터를 구성하는 순서는 다음과 같다.
-
-. <<TerraformInstallAws, Terraform 설치>>
-
-[#TerraformInstallAws]
-=== Terraform 설치
-
-
-
 [#EKSNode]
 == 노드 생성
 
 [#EFSSetting]
 == EFS-CSI 드라이버 설치
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 [#BastionSetting]
 == Bastion 서버 설정
@@ -148,7 +111,6 @@ eks 클러스터를 구성하는 순서는 다음과 같다.
 . <<PackageSetting, 패키지 설정>>
 . <<WebServerSetting, 웹 서버 레포지터리 설정>>
 . <<ImageRegistrySetting, 로컬 이미지 레지스트리 설정>>
-. <<KubesprayRunArgoEks, Kubespray 실행>>
 
 [#PackageSetting]
 === 패키지 설정
