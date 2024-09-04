@@ -5,7 +5,7 @@
 설치하는 과정은 크게 다음과 같다.
 
 . <<AzureVM, 가상 머신 구성>>
-. <<AzureBastion, Bastion 설치>>
+. <<AzureBastion, Bastion 구성성>>
 . <<BastionSetting, Bastion 설정>>
 . <<ArgocdInstallAks, ArgoCD 설치>>
 . <<MasterClusterAks, 마스터 클러스터 설치>>
@@ -17,7 +17,7 @@
 
 본 절에서는 폐쇄망인 AKS 클러스터에 bastion으로 사용하기 위한 가상 머신을 구성하는 방법에 대해서 설명한다.
 
-가상 머신을 구성하지 않고 AKS 클러스터 노드에 직접 bastion을 사용하는 경우 아래의 Bastion 구성 가이드를 참고한다. 
+가상 머신을 구성하지 않고 AKS 클러스터 노드에 직접 bastion을 사용하는 경우 아래의 2.Bastion 구성 가이드를 참고한다. 
 
 가상 머신을 구성하는 순서는 다음과 같다. 
 
@@ -94,9 +94,9 @@ $ sudo systemctl stop firewalld
 [#AzureBastion]
 == Bastion 설치
 
-본 절에서는 Kubespray를 AKS 클러스터에서 사용하기 위한 Azure Bastion을 설치하는 방법에 대해서 설명한다. 
+본 절에서는 Kubespray를 AKS 클러스터에서 사용하기 위한 Azure Bastion을 구성하는 방법에 대해서 설명한다. 
 
-Bastion을 설치하는 순서는 다음과 같다.
+Bastion을 구성하는 순서는 다음과 같다.
 
 . <<CreateSshKey, SSH 키 쌍 생성>>
 . <<ConfigNetwork, 네트워크 설정>>
