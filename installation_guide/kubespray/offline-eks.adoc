@@ -278,7 +278,7 @@ $ tar -xvf hypercloud5.3-images.tar
 +
 .컨테이너 실행
 ----
-$ docker run -it -d -p{IMAGE_REGISTRY_IP:PORT}:5000 --privileged -v {IMAGE_FILE_PATH}:/var/lib/registry registry
+$ docker run -it -d -p {IMAGE_REGISTRY_IP:PORT}:5000 --privileged -v {IMAGE_FILE_PATH}:/var/lib/registry registry
 ----
 +
 컨테이너 실행 명령어의 인자 값에 대한 설명은 다음과 같다.
@@ -339,7 +339,7 @@ ArgoCD를 설치하는 순서는 다음과 같다.
 [#KubesprayDecompressionArgoAks]
 === Kubespray 파일 압축 해제
 
-ArgoCD 설치를 위해 테크넷을 통해서 다운로드한 *kubespray-eks.zip* 파일을 생성한 bastion 서버에 압축을 해제한다.
+ArgoCD 설치를 위해 테크넷을 통해서 다운로드한 *kubespray-5.3.zip* 파일을 생성한 bastion 서버에 압축을 해제한다.
 
 [#KubesprayConfigArgoAks]
 === Kubespray 환경 설정
@@ -348,11 +348,11 @@ Kubespray를 실행하기 위한 필수 설정 파일들을 정의한다.
 
 NOTE: Kubespray를 실행하기 위해서는 사전 준비가 필요하다. 반드시  xref:offline-intro.adoc[설치 전 준비사항]을 참고하여 환경을 구성한다. bastion을 proxy하여 master node나 worker node에 접근한다. bastion에도 다른 노드에 접근하기 위해서 pem 파일이 필요하다.
 
-CAUTION: RHEL 운영체제일 경우 `kubespray-infra/cluster.yml` 파일을 열어 *- { role: bootstrap-os, tags: bootstrap-os}* 행을 반드시 주석 처리해야 한다.
+CAUTION: RHEL 운영체제일 경우 `kubespray-5.3/cluster.yml` 파일을 열어 *- { role: bootstrap-os, tags: bootstrap-os}* 행을 반드시 주석 처리해야 한다.
 
 . *노드 정보 등록*
 + 
-`kubespray-infra/inventory/tmaxcloud/inventory.ini` 파일을 열어 kubespray에서 설치할 노드들의 정보를 등록한다. +
+`kubespray-5.3/inventory/tmaxcloud/inventory.ini` 파일을 열어 kubespray에서 설치할 노드들의 정보를 등록한다. +
 eks는 사용자가 control-plane 노드에 접근을 하지 못해 [kube_control_plane]을 bastion 노드로 설정한다.
 +
 .예시
@@ -384,7 +384,7 @@ kube_node
 
 . *쿠버네티스 기본 정보 설정*
 +
-`kubespray-infra/inventory/tmaxcloud/group_vars/all/all.yml` 파일을 열어 Kubernetes의 기본 정보를 설정한다. + 
+`kubespray-5.3/inventory/tmaxcloud/group_vars/all/all.yml` 파일을 열어 Kubernetes의 기본 정보를 설정한다. +
 이때 loadbalancer_apiserver의 address 명은 주석처리 한다.
 +
 .예시
@@ -404,7 +404,7 @@ upstream_dns_servers: <3>
 
 . *폐쇄망 정보 설정*
 +
-`kubespray-infra/inventory/tmaxcloud/group_vars/all/offline.yml` 파일을 열어 폐쇄망 관련 정보를 설정한다.
+`kubespray-5.3/inventory/tmaxcloud/group_vars/all/offline.yml` 파일을 열어 폐쇄망 관련 정보를 설정한다.
 +
 .예시
 ----
@@ -417,32 +417,9 @@ files_repo: "http://172.22.5.2" <3>
 <2> 프라이빗 레지스트리 주소
 <3> 파일 리포지터리 주소
 
-. *efs 설정*
-+
-`kubespray-infra/inventory/tmaxcloud/group_vars/k8s_cluster/addons.yml` 파일을 열어 efs를 설정한다.
-+
-.예시
-----
-default_storageclass_name: efs-sc <1>
-sc_name_0: efs-sc-0 <2>
-sc_name_999: efs-sc-999 <3>
-nfs_external_provisioner_enabled: false <4>
-aws_efs_csi_enabled: true <5>
-aws_efs_csi_namespace: aws-efs-csi <6>
-aws_efs_filesystem_id: fs-XXX <7>
-----
-+
-<1> 기본값으로 설정할 스토리지 이름
-<2> HyperRegistry에서 Postgres PVC의 스토리지 클래스 이름
-<3> 그 외의 PVC 스토리지 클래스 이름
-<4> NFS Provisioner 설치 여부
-<5> AWS EFS CSI 드라이버 설치 여부
-<6> AWS EFS CSI 스토리지의 네임스페이스 이름
-<7> AWS EFS 파일 시스템의 ID
-
 . *domain 설정*
 +
-`kubespray-infra/inventory/tmaxcloud/group_vars/k8s_cluster/k8s-cluster.yml` 파일을 열어 domain을 설정한다.
+`kubespray-5.3/inventory/tmaxcloud/group_vars/k8s_cluster/k8s-cluster.yml` 파일을 열어 domain을 설정한다.
 +
 .예시
 ----
@@ -456,14 +433,23 @@ api_server_dns_cfwhn: true
 
 . *설치할 애플리케이션 구성 정보 확인*
 +
-해당 애플리케이션의 구성 정보는 기본적으로 `kubespray-aws/inventory/tmaxcloud/group_vars/k8s_cluster/addon.yml` 파일에서 설정이 가능하며, 추가적으로 커스터마이징이 필요할 경우에는 `kubespray-aws/roles/bootstrap-cloud/task/` 및 `kubespray-aws/roles/bootstrap-cloud/templates/` 하위 파일에서 설정이 가능하다.
+해당 애플리케이션의 구성 정보는 기본적으로 `kubespray-aws/inventory/tmaxcloud/group_vars/k8s_cluster/addon.yml` 파일에서 설정이 가능하며, 추가적으로 커스터마이징이 필요할 경우에는 `kubespray-5.3/roles/bootstrap-cloud/task/` 및 `kubespray-5.3/roles/bootstrap-cloud/templates/` 하위 파일에서 설정이 가능하다.
 +
 
 . *설치 모듈 설정*
 +
 Kubespray로 설치될 애플리케이션(`nginx`, `hyperregistry`, `gitea`, `argocd`)의 구성 정보를 확인 및 설정한다. +
-`kubespray-infra/role/bootstrap-cloud/default/main.yml` 파일을 열어 argocd 설치를 위한 모듈 관련 정보를 설정한다. 해당 파일에서 storageclass, subdomain을 설정할 수 있다.
+`kubespray-5.3/role/bootstrap-cloud/default/main.yml` 파일을 열어 argocd 설치를 위한 모듈 관련 정보를 설정한다. 해당 파일에서 storageclass, subdomain을 설정할 수 있다.
 +
+[CAUTION]
+.eks용 모듈별 pvc storageclass 설정
+====
+1. hyperregistry_storage_class : efs-sc  +
+2. hyperregistry_database_storage_class : efs-sc-999 +
+3. gitea_storage_class : efs-sc-1000 +
+4. gitea_mariadb_storage_class : efs-sc-1001 +
+====
+
 [#KubesprayRunArgoEks]
 === Kubespray 실행
 
@@ -471,7 +457,7 @@ ansible-playbook 명령을 사용하여 애플리케이션을 설치한다.
 
 .사용 방법
 ----
-$ ansible-playbook -i ./inventory/tmaxcloud/inventory.ini ./cluster.yml -t bootstrap-cloud -e ansible_user=centos -e ansible_ssh_private_key_file={PEM_PATH} -e cloud_provider=aws -b --become-user=root
+$ ansible-playbook -i ./inventory/tmaxcloud/inventory.ini ./cluster.yml -t bootstrap-cloud -e ansible_user=ec2-user -e ansible_ssh_private_key_file={PEM_PATH} -e cloud_provider=aws -b --become-user=root
 ----
 Kubespray 실행 명령의 인자 값에 대한 설명은 다음과 같다.
 
@@ -486,9 +472,9 @@ Kubespray 실행 명령의 인자 값에 대한 설명은 다음과 같다.
 [#MasterClusterEks]
 == 마스터 클러스터 설치
 
-. *애플리케이션 변수 설정*
+. *글로벌 변수 설정*
 +
-`kubespray-onpremise/roles/bootstrap-cloud/templates/argocd_installer/application/app_of_apps/master-applications.yaml` 파일을 열어 마스터 클러스터의 애플리케이션 변수를 설정한다.
+`kubespray-5.3/roles/bootstrap-cloud/templates/argocd_installer/application/app_of_apps/master-applications.yaml` 파일을 열어 마스터 클러스터의 글로벌 변수를 설정한다.
 +
 .예시
 ----
@@ -528,6 +514,21 @@ source:
 <8> master-applications.yaml용 ArgoCD와 연동된 Gitea 저장소 주소 (Gitea의 경우 URL 마지막에 .git을 추가)
 <9> master-applications.yaml용 Gitea에 연동되어 있는 argocd-installer의 브랜치 이름
 
+. *애플리케이션 변수 설정*
++
+`kubespray-5.3/roles/bootstrap-cloud/templates/argocd_installer/application/helm/master-values.yaml` 파일을 열어 마스터 클러스터의 애플리케이션 변수를 설정한다.
+해당 파일에서 설치하고자 하는 모듈의 pvc storageclass를 eks에 맞게 변경한다.
+
+[CAUTION]
+.eks용 모듈별 pvc storageclass 설정
+====
+1. hyperregistry_storage_class : efs-sc  +
+2. hyperregistry_database_storage_class : efs-sc-999 +
+3. gitea_storage_class : efs-sc-1000 +
+4. gitea_mariadb_storage_class : efs-sc-1001 +
+5. hyperauth, hypercloud5-system : efs-sc-0 +
+6. loki, grafana, prometheus, nexus : efs-sc
+====
 . *Gitea 동기화 작업*
 +
 ArgoCD와 연동된 Gitea의 argocd-installer 브랜치에서 `master-values.yaml`, `master-applications.yaml` 파일을 열어 위의 1~3번 과정과 동일하게 환경 변수를 설정한다.
