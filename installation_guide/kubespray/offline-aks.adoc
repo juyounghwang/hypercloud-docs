@@ -4,11 +4,62 @@
 
 설치하는 과정은 크게 다음과 같다.
 
+. <<AzureVM, 가상 머신 구성>>
 . <<AzureBastion, Bastion 설치>>
 . <<BastionSetting, Bastion 설정>>
 . <<ArgocdInstallAks, ArgoCD 설치>>
 . <<MasterClusterAks, 마스터 클러스터 설치>>
 . <<ResourceDeployAks, 리소스 배포>>
+
+
+[#AzureVM]
+== 가상 머신 구성
+
+본 절에서는 폐쇄망인 AKS 클러스터에 bastion으로 사용하기 위한 가상 머신을 구성하는 방법에 대해서 설명한다.
+
+가상 머신을 구성하지 않고 AKS 클러스터 노드에 직접 bastion을 사용하는 경우 아래의 Bastion 구성 가이드를 참고한다. 
+
+가상 머신을 구성하는 순서는 다음과 같다. 
+
+. <<CreateVM, 가상 머신 생성>>
+. <<ConfingNetwork, 네트워크 설정>>
+. <<ExpandVolume, 볼륨 확장>>
+. <<DisableFirewalld, 방화벽 비활성화>>
+
+[#CreateVM]
+=== 가상 머신 생성
+
+아래의 옵션으로 가상 머신을 생성한다. 
+
+[width="100%",options="header", cols="1,3"]
+|====================
+|옵션|설명
+
+|기본 사항|- 구독 : AKS와 동일한 구독을 선택 
+
+- 리소스 그룹 : AKS와 동일한 리소스 그룹을 선택
+
+- 이미지 : Red Hat Enterprise Linux 8.10(LVM) - x64 Gen2
+
+- 인증 형식 : SSH 공개 키
+
+- SSH 공개 키 원본 : 새 키 쌍 생성 또는 Azure에 저장된 기존 키 사용
+
+|네트워킹|- 가상 네트워크 : AKS와 동일한 가상 네트워크를 선택
+
+- 서브넷 : AKS와 동일한 서브넷을 선택
+
+- 공용 IP : 기존에 사용 중인 공용 IP가 없는 경우 새로 만들기 
+
+- NIC 네트워크 보안 그룹 : 기본
+
+- 공용 인바운드 포트 : 선택한 포트 허용
+
+- 인바운드 포트 선택 : SSH(22)
+
+- 부하 분산 옵션 : 없음
+|====================
++
 
 
 [#AzureBastion]
