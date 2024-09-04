@@ -81,6 +81,15 @@ $ lvextend -L +20G /dev/rootvg/homelv
 ----
 
 
+[#DisableFirewalld]
+=== 방화벽 비활성화
+로컬 레포지토리를 사용하기 위해 방화벽을 비활성화한다. 
+
+----
+$ sudo systemctl stop firewalld
+----
+
+
 
 [#AzureBastion]
 == Bastion 설치
