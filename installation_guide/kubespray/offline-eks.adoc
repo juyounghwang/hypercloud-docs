@@ -45,7 +45,7 @@ VPC는 AWS Management Console을 통해 생성하거나, AWS CloudFormation 템�
 
 본 가이드에서는 AWS Management Console을 사용하여 VPC를 생성하는 방법을 다룬다.
 
-[VPC 서비스 > VPC > VPC 생성] 화면에서 '생성할 리소스'로 'VPC 등'을 선택하고, '이름'을 입력하고, 환경에 맞게 다른 값들을 설정한다.
+[VPC 서비스 > VPC > VPC 생성] 에서 '생성할 리소스'로 'VPC 등'을 선택하고, '이름'을 입력하고, 환경에 맞게 다른 값들을 설정한다.
 
 image::../../images/eks_create_vpc.png[]
 
@@ -57,10 +57,38 @@ AWS CLI, kubectl, eksctl 명령을 실행할 Bastion 서버를 생성한다.
 . *Bastion 서버 생성*
 +
 .. 키 페어 생성
++
+[EC2 서비스 > 네트워크 및 보안 > 키 페어 > 키 페어 생성] 에서 외부에서 Bastion 서버로 원격 접속하는 데 필요한 한 쌍의 키 페어를 생성한다.
++
+private key는 PC에 다운로드 되고, public key는 AWS에 저장된다.
++
+image::../../images/eks_create_keypair.png[]
++
 .. 보안 그룹 생성
++
+[EC2 서비스 > 네트워크 및 보안 > 보안 그룹 > 보안 그룹 생성] 에서 VPC를 설정하고, 인바운드 규칙(유형: SSH, 소스: 내 IP)을 추가하여 보안 그룹을 생성한다.
++
+image::../../images/eks_create_sg.png[]
++
 .. 인스턴스 생성
++
+[EC2 서비스 > 인스턴스 > 인스턴스 시작] 에서 이름을 입력하고, AMI와 인스턴스 유형을 선택한다.
++
+키 페어에서 전 단계에서 생성한 키 페어를 선택한다.
++
+네트워크 설정에서 편집을 누르고, 생성한 VPC를 선택하고, 서브넷에 Public Subnet을 선택, 퍼블릭 IP 자동 할당을 활성화한다.
++
+방화벽(보안 그룹)은 '보안 그룹 생성'을 선택하여 기본으로 입력되어 있는 ssh에 대한 인바운드 규칙을 생성하여 인스턴스를 생성한다.
++
+image::../../images/eks_create_bastion.png[]
 
 . *AWS CLI 설치*
++
+pem 파일을 사용하여 Bastion의 퍼블릭 IPv4 주소로 접속한다.
++
+----
+$ ssh -i <pem-file-name>.pem ec2-user@<bastion-public-ip>
+----
 +
 AWS CLI 설치 파일을 다운로드 받고, 압축 해제한 후 설치 프로그램을 실행한다.
 +
