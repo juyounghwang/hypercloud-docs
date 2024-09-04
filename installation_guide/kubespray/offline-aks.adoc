@@ -92,7 +92,7 @@ $ sudo systemctl stop firewalld
 
 
 [#AzureBastion]
-== Bastion 설치
+== Bastion 구성
 
 본 절에서는 Kubespray를 AKS 클러스터에서 사용하기 위한 Azure Bastion을 구성하는 방법에 대해서 설명한다. 
 
