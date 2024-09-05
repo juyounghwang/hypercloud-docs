@@ -4,7 +4,7 @@
 
 == 설치 구성
 . AKS 또는 EKS 클러스터 구성
-. kubespray-5.3 실행을 통한 nginx-ingress, argocd 설치
+. kubespray-5.3 실행을 통한 nginx-ingress, hyperregistry, gitea, argocd 설치
 . ArgoCD를 통해 애플리케이션을 배포
 
 == 시스템 요구사항
@@ -14,7 +14,7 @@ HyperCloud 설치를 위한 시스템 요구사항은 다음과 같다.
 [width="100%",options="header", cols="1,3"]
 |====================
 |구분|요구사항
-|AKS 구성|Kubernetes 버전 : 1.27.9
+|AKS 구성|Kubernetes 버전 : 1.28
 
 인증 및 권한 부여 : Kuberentes RBAC가 있는 로컬 계정
 
