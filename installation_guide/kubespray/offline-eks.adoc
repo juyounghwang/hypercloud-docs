@@ -7,7 +7,7 @@
 . <<EKSVPCBastion, VPC 및 Bastion 서버 생성>>
 . <<EKSCluster, EKS 클러스터 생성 및 설정>>
 . <<EKSNode, 노드 생성>>
-. <<EFSSetting, EFS-CSI 드라이버 설치>>
+. <<EFSSetting, EFS-CSI 드라이버 설치 및 스토리지 설정>>
 . <<BastionSetting, Bastion 서버 설정>>
 . <<ArgoCDInstallEks, ArgoCD 설치>>
 . <<MasterClusterEks, 마스터 클러스터 설치>>
@@ -41,12 +41,10 @@ AWS Management Console은 GUI 기반의 설정 환경을 제공하여, 'eksctl'�
 [#VPCCreating]
 === VPC 생성
 
-VPC는 AWS Management Console을 통해 직접 생성하거나, AWS CloudFormation 템플릿을 사용해 자동으로 생성할 수 있다.
-
+VPC는 AWS Management Console을 통해 직접 생성하거나, AWS CloudFormation 템플릿을 사용해 자동으로 생성할 수 있다. +
 여기서는 AWS Management Console을 사용해 VPC를 생성하는 방법을 설명한다.
 
-AWS Management Console에서 [VPC 서비스 > VPC > VPC 생성] 으로 이동한다.
-
+AWS Management Console에서 [VPC 서비스 > VPC > VPC 생성] 으로 이동한다. +
 '생성할 리소스'에서 'VPC 등'을 선택하고, '이름'을 입력한 후 환경에 맞게 다른 설정 값을 지정한다.
 
 image::../../images/eks_create_vpc.png[]
@@ -60,20 +58,16 @@ Bastion 서버는 외부에서 접근할 수 있는 서버로, AWS CLI, kubectl,
 +
 .. 키 페어 생성
 +
-[EC2 서비스 > 네트워크 및 보안 > 키 페어 > 키 페어 생성] 에서 Bastion 서버로 원격 접속하는 데 필요한 한 쌍의 키 페어를 생성한다.
-+
+[EC2 서비스 > 네트워크 및 보안 > 키 페어 > 키 페어 생성] 에서 Bastion 서버로 원격 접속하는 데 필요한 한 쌍의 키 페어를 생성한다. +
 private key는 로컬 PC에 다운로드되고, public key는 AWS에 저장된다.
 +
 image::../../images/eks_create_keypair.png[]
 +
 .. 인스턴스 생성
 +
-[EC2 서비스 > 인스턴스 > 인스턴스 시작] 에서 이름을 입력하고, AMI와 인스턴스 유형을 선택한다.
-+
-키 페어 설정 단계에서 앞서 생성한 키 페어를 선택한다.
-+
-네트워크 설정을 편집하여 생성한 VPC를 선택하고, 서브넷은 Public Subnet을 선택하여 퍼블릭 IP 자동 할당을 활성화한다.
-+
+[EC2 서비스 > 인스턴스 > 인스턴스 시작] 에서 이름을 입력하고, AMI와 인스턴스 유형을 선택한다. +
+키 페어 설정 단계에서 앞서 생성한 키 페어를 선택한다. +
+네트워크 설정을 편집하여 생성한 VPC를 선택하고, 서브넷은 Public Subnet을 선택하여 퍼블릭 IP 자동 할당을 활성화한다. +
 보안 그룹을 생성하고, SSH 포트(TCP/22)에 대한 인바운드 규칙을 추가한 후 인스턴스를 생성한다.
 +
 image::../../images/eks_create_bastion.png[]
@@ -189,8 +183,7 @@ IAM 정책을 역할에 연결한다.
 
 . *클러스터 생성*
 +
-콘솔에서 [Elastic Kubernetes Service > 클러스터 > 클러스터 추가 > 생성]을 선택하여 클러스터를 생성한다.
-+
+콘솔에서 [Elastic Kubernetes Service > 클러스터 > 클러스터 추가 > 생성]을 선택하여 클러스터를 생성한다. +
 '클러스터 서비스 역할'에 이전 단계에서 생성한 IAM 역할을 선택하고, Kubernetes 버전 1.28을 선택한다.
 +
 image::../../images/eks_create_cluster_01.png[]
@@ -211,16 +204,13 @@ image::../../images/eks_create_cluster_04.png[]
 +
 image::../../images/eks_create_cluster_05.png[]
 +
-설정을 검토하고 클러스터를 생성한다.
-+
-생성한 클러스터의 상태가 '활성'이 될 때까지 기다린다.
+설정을 검토하고 클러스터를 생성한다. 생성한 클러스터의 상태가 '활성'이 될 때까지 기다린다.
 +
 image::../../images/eks_create_cluster_06.png[]
 
 . *클러스터 통신 구성*
 +
-kubeconfig 파일을 생성 또는 업데이트한다.
-+
+kubeconfig 파일을 생성 또는 업데이트한다. +
 ~/.kube 디렉터리에 새 config 파일이 생성되거나 기존 config 파일에 새 클러스터의 구성이 추가된다.
 +
 ----
@@ -324,8 +314,7 @@ image::../../images/eks_create_nodegroup_05.png[]
 +
 image::../../images/eks_create_nodegroup_06.png[]
 +
-노드 그룹 상태가 '활성' 상태이고, 각 노드가 '준비 완료' 상태가 되면 Bastion 서버에 접속하여 확인한다.
-+
+노드 그룹 상태가 '활성' 상태이고, 각 노드가 '준비 완료' 상태가 되면 Bastion 서버에 접속하여 확인한다. +
 Bastion 서버에서 다음 kubectl 명령어들을 실행하여 노드와 시스템 파드, 서비스 상태를 확인한다.
 +
 ----
@@ -334,12 +323,204 @@ $ kubectl get pods -A
 $ kubectl get svc -A
 ----
 +
-위 명령어들을 통해 모든 워커 노드가 올바르게 등록되었는지, 시스템 파드와 서비스가 정상적으로 작동하는지 확인할 수 있다.
+위 명령어들을 통해 모든 워커 노드가 올바르게 등록되었는지, 시스템 파드와 서비스가 정상적으로 작동하는지 확인할 수 있다. 
 +
 만약 노드가 정상적으로 생성되지 않거나 상태가 '준비 완료'가 되지 않는 경우, 클러스터의 보안 그룹 규칙을 확인한다. 필요한 포트와 프로토콜이 적절히 허용되었는지 검토하고, VPC 및 서브넷 설정을 재확인한다.
 
 [#EFSSetting]
-== EFS-CSI 드라이버 설치
+== EFS-CSI 드라이버 설치 및 스토리지 설정
+
+. *IAM 역할 생성*
++
+EFS CSI 드라이버가 파일 시스템과 상호 작용하려면 IAM 권한이 필요하다. IAM 역할을 생성하고 정책을 연결한다. 
++
+----
+$ export cluster_name=my-cluster   // my-cluster를 클러스터 이름으로 변경
+$ export role_name=AmazonEKS_EFS_CSI_DriverRole   // AmazonEKS_EFS_CSI_DriverRole을 역할의 이름으로 변경
+$ eksctl create iamserviceaccount \
+    --name efs-csi-controller-sa \
+    --namespace kube-system \
+    --cluster $cluster_name \
+    --role-name $role_name \
+    --role-only \
+    --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy \
+    --approve
+$ TRUST_POLICY=$(aws iam get-role --role-name $role_name --query 'Role.AssumeRolePolicyDocument' | \
+    sed -e 's/efs-csi-controller-sa/efs-csi-*/' -e 's/StringEquals/StringLike/')
+$ aws iam update-assume-role-policy --role-name $role_name --policy-document "$TRUST_POLICY"
+----
+
+. *EFS-CSI 드라이버 설치*
++
+EKS 콘솔에서 [클러스터 > 클러스터 선택 > 추가 기능 탭 > 추가 기능 가져오기]로 이동하여 'Amazon EFS CSI 드라이버'를 선택한다.
++
+image::../../images/eks_create_efscsidriver_01.png[]
++
+image::../../images/eks_create_efscsidriver_02.png[]
++
+드라이버 버전 및 앞서 생성한 IAM 역할을 선택하여 설치를 진행한다.
++
+image::../../images/eks_create_efscsidriver_03.png[]
++
+설치 후 efs-csi-controller와 efs-csi-node가 배포되었는지 확인한다.
++
+----
+$ kubectl get pod -n kube-system | grep csi
+$ kubectl get sa -n kube-system | grep csi
+----
+
+. *EFS 파일 시스템 생성*
++
+Amazon EFS 파일 시스템을 생성하여 클러스터 내에서 사용할 수 있도록 준비한다. +
+AWS Management Console에서 수동으로 생성할 수 있지만, 본 매뉴얼에서는 AWS CLI를 통해 생성하는 방법을 다룬다. 자세한 내용은 link:https://github.com/kubernetes-sigs/aws-efs-csi-driver/blob/master/docs/efs-create-filesystem.md[Create an Amazon EFS file system for Amazon EKS]를 참고한다.
++
+클러스터가 있는 VPC ID와 CIDR 범위를 검색하여 이후 단계에서 사용할 수 있도록 변수에 저장한다.
++
+----
+$ vpc_id=$(aws eks describe-cluster \
+    --name my-cluster \   // my-cluster를 클러스터 이름으로 변경
+    --query "cluster.resourcesVpcConfig.vpcId" \
+    --output text)
+$ cidr_range=$(aws ec2 describe-vpcs \
+    --vpc-ids $vpc_id \
+    --query "Vpcs[].CidrBlock" \
+    --output text \
+    --region region-code)   // region-code를 클러스터가 있는 AWS 리전으로 변경
+----
++
+보안 그룹을 생성한다.
++
+----
+$ security_group_id=$(aws ec2 create-security-group \
+    --group-name MyEfsSecurityGroup \   // 보안 그룹 이름 설정
+    --description "My EFS security group" \   // 보안 그룹 설명
+    --vpc-id $vpc_id \
+    --output text)
+----
++
+클러스터의 VPC에 대한 CIDR에서 인바운드 NFS 트래픽을 허용하는 인바운드 규칙을 만든다.
++
+----
+$ aws ec2 authorize-security-group-ingress \
+    --group-id $security_group_id \
+    --protocol tcp \
+    --port 2049 \
+    --cidr $cidr_range
+----
++
+EKS 클러스터에 대한 EFS 파일 시스템을 만든다.
++
+----
+$ file_system_id=$(aws efs create-file-system \
+    --region region-code \   // region-code를 클러스터가 있는 AWS 리전으로 변경
+    --performance-mode generalPurpose \
+    --query 'FileSystemId' \
+    --output text)
+----
++
+마운트 타겟을 생성하기 위해 클러스터 노드의 IP 주소를 확인한다.
++
+----
+$ kubectl get nodes
+----
++
+VPC에 있는 서브넷의 ID와 서브넷이 있는 가용 영역을 확인한다.
++
+----
+$ aws ec2 describe-subnets \
+    --filters "Name=vpc-id,Values=$vpc_id" \
+    --query 'Subnets[*].{SubnetId: SubnetId,AvailabilityZone: AvailabilityZone,CidrBlock: CidrBlock}' \
+    --output table
+----
++
+노드가 있는 서브넷에 대한 마운트 대상을 추가한다. 클러스터에 노드가 더 있는 경우 노드가 있는 각 가용 영역의 서브넷에 대해 명령을 한 번 더 실행해야 한다.
++
+----
+$ aws efs create-mount-target \
+    --file-system-id $file_system_id \
+    --subnet-id subnet-EXAMPLEe2ba886490 \   // 노드가 있는 모든 가용 영역 id로 값을 변경하며 실행
+    --security-groups $security_group_id
+----
++
+콘솔에서 생성된 파일 시스템을 확인할 수 있다.
++
+image::../../images/eks_create_filesystem.png[]
+
+. *EFS 스토리지 클래스 구성*
++
+Kubernetes 클러스터와 HyperCloud 설치에서 사용할 EFS 스토리지 클래스를 정의한다. 아래 YAML 파일을 클러스터에 적용하여 스토리지 클래스를 생성한다.
++
+----
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-0a12d7527838405e8
+  directoryPerms: "700"
+
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc-0
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-0a12d7527838405e8
+  directoryPerms: "755"
+  uid: "0"
+  gid: "0"
+  basePath: "/dynamic_provisioning" # optional
+  
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc-999
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-0a12d7527838405e8
+  directoryPerms: "755"
+  uid: "999"
+  gid: "999"
+  basePath: "/dynamic_provisioning" # optional
+  
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc-1000
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-0a12d7527838405e8
+  directoryPerms: "755"
+  uid: "1000"
+  gid: "1000"
+  basePath: "/dynamic_provisioning" # optional
+  
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc-1001
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-0a12d7527838405e8
+  directoryPerms: "755"
+  uid: "1001"
+  gid: "1001"
+  basePath: "/dynamic_provisioning" # optional
+----
+
+. *샘플 앱 배포*
++
+EFS 파일 시스템을 PV로 사용하는 샘플 애플리케이션을 배포하여 정상 설치 여부를 확인한다.
 
 [#BastionSetting]
 == Bastion 서버 설정
