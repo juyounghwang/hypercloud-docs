@@ -330,6 +330,14 @@ $ kubectl get svc -A
 [#EFSSetting]
 == EFS-CSI 드라이버 설치 및 스토리지 설정
 
+본 절에서는 EKS 클러스터에서 Amazon EFS-CSI 드라이버를 설치하고, 파일 시스템 및 스토리지 클래스를 생성하는 방법에 대해 설명한다.
+
+.다음의 사전 준비가 필요하다.
+[NOTE]
+====
+* 클러스터에 대한 IAM OIDC(OpenID Connect) 공급자 활성화
+====
+
 . *IAM 역할 생성*
 +
 EFS CSI 드라이버가 파일 시스템과 상호 작용하려면 IAM 권한이 필요하다. IAM 역할을 생성하고 정책을 연결한다. 
